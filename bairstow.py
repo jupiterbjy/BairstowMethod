@@ -25,12 +25,12 @@ def _synthetic_division(
     """Perform synthetic division of polynomial via `x^2 + ux + v`
 
     Args:
-        coefficients: Polynomial coefficients
-        u: first degree coefficient
-        v: constant term
+        coefficients: Polynomial coefficients (constant term first)
+        u: first degree coefficient of divisor
+        v: constant term of divisor
 
     Returns:
-        Resulting polynomial coefficients
+        Resulting polynomial coefficients in reversed order
     """
 
     n = len(coefficients)
@@ -49,7 +49,7 @@ def _synthetic_division(
 
 # noinspection DuplicatedCode
 def bairstow_complex(
-    coefficients: Sequence[float], max_iterations: int = 10
+    coefficients: Sequence[float], max_iterations: int = 50
 ) -> List[complex]:
     """
     Bairstow's Method for finding polynomial roots.
@@ -126,7 +126,7 @@ def bairstow_complex(
 
 
 # noinspection DuplicatedCode
-def bairstow(coefficients: Sequence[float], max_iterations: int = 10) -> List[float]:
+def bairstow(coefficients: Sequence[float], max_iterations: int = 50) -> List[float]:
     """
     Bairstow's Method for finding polynomial roots, non-complex roots only.
 
@@ -135,7 +135,7 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 10) -> List[fl
         max_iterations: Maximum number of iterations to perform.
 
     Returns:
-        List storing the found roots, none-sorted due to existence of complex roots.
+        List storing the found roots, sorted in ascending order.
 
     Raises:
         ZeroDivisionError: If calculation encountered division by zero.
@@ -156,7 +156,6 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 10) -> List[fl
     coefficients = coefficients[::-1]
 
     for _ in range(max_iterations):
-        max_iterations -= 1
         deg = len(coefficients) - 1
 
         # perform hardwired calculations for deg < 3
