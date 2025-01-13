@@ -49,7 +49,7 @@ def _synthetic_division(
 
 # noinspection DuplicatedCode
 def bairstow_complex(
-    coefficients: Sequence[float], max_iterations: int = 100
+    coefficients: Sequence[float], max_iterations: int = 10
 ) -> List[complex]:
     """
     Bairstow's Method for finding polynomial roots.
@@ -79,8 +79,7 @@ def bairstow_complex(
     # flip coefficients to fit into this algorithm
     coefficients = coefficients[::-1]
 
-    while True:
-        max_iterations -= 1
+    for _ in range(max_iterations):
         deg = len(coefficients) - 1
 
         # perform hardwired calculations for deg < 3
@@ -111,7 +110,7 @@ def bairstow_complex(
         v += (-c[1] * -b[1] + c[2] * -b[0]) / d
 
         # Check for convergence or iteration limit, infinite loop do happens.
-        if (abs(b[0]) > 1e-14 or abs(b[1]) > 1e-14) and max_iterations:
+        if abs(b[0]) > 1e-14 or abs(b[1]) > 1e-14:
             continue
 
         # if degree is still large then extract roots of quadratic factor & continue
@@ -122,9 +121,12 @@ def bairstow_complex(
 
             coefficients = b[2:]
 
+    # welp couldn't break within max_iterations
+    return roots
+
 
 # noinspection DuplicatedCode
-def bairstow(coefficients: Sequence[float], max_iterations: int = 100) -> List[float]:
+def bairstow(coefficients: Sequence[float], max_iterations: int = 10) -> List[float]:
     """
     Bairstow's Method for finding polynomial roots, non-complex roots only.
 
@@ -153,7 +155,7 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 100) -> List[f
     # flip coefficients to fit into this algorithm
     coefficients = coefficients[::-1]
 
-    while True:
+    for _ in range(max_iterations):
         max_iterations -= 1
         deg = len(coefficients) - 1
 
@@ -186,7 +188,7 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 100) -> List[f
         v += (-c[1] * -b[1] + c[2] * -b[0]) / d
 
         # Check for convergence or iteration limit, infinite loop do happens.
-        if (abs(b[0]) > 1e-14 or abs(b[1]) > 1e-14) and max_iterations:
+        if abs(b[0]) > 1e-14 or abs(b[1]) > 1e-14:
             continue
 
         # if degree is still large then extract roots of quadratic factor & continue
@@ -199,6 +201,9 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 100) -> List[f
                 roots.append((u + d_sqrt) / 2)
 
             coefficients = b[2:]
+
+    # welp couldn't break within max_iterations
+    return roots
 
 
 # --- Tests ---
