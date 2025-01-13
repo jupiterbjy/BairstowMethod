@@ -160,11 +160,11 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 50) -> List[fl
 
         # perform hardwired calculations for deg < 3
         if deg < 1:
-            return roots
+            return sorted(roots)
 
         if deg == 1 and coefficients[1] != 0:
             roots.append(-coefficients[0] / coefficients[1])
-            return roots
+            return sorted(roots)
 
         if deg == 2:
             d = coefficients[1] ** 2 - 4 * coefficients[2] * coefficients[0]
@@ -173,7 +173,7 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 50) -> List[fl
                 d_sqrt = math.sqrt(d)
                 roots.append((-coefficients[1] - d_sqrt) / (2 * coefficients[2]))
                 roots.append((-coefficients[1] + d_sqrt) / (2 * coefficients[2]))
-            return roots
+            return sorted(roots)
 
         # deg >= 3, perform Bairstow's method
 
@@ -202,7 +202,7 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 50) -> List[fl
             coefficients = b[2:]
 
     # welp couldn't break within max_iterations
-    return roots
+    return sorted(roots)
 
 
 # --- Tests ---
