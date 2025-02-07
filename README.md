@@ -1,4 +1,4 @@
-# Bairstow's Method Python3 Implementation
+# Bairstow's Method Python3/GDScript Implementation
 
 Bairstow's Method for finding polynomial roots in iterative way.
 
