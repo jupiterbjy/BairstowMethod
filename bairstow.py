@@ -20,26 +20,26 @@ __all__ = ["bairstow", "bairstow_complex"]
 
 
 def _synthetic_division(
-    coefficients: MutableSequence[float], u: float, v: float
+    coeffs: MutableSequence[float], u: float, v: float
 ) -> List[float]:
     """Perform synthetic division of polynomial via `x^2 + ux + v`
 
     Args:
-        coefficients: Polynomial coefficients (constant term first)
+        coeffs: Polynomial Coefficients (constant term first)
         u: first degree coefficient of divisor
         v: constant term of divisor
 
     Returns:
-        Resulting polynomial coefficients in reversed order
+        Resulting polynomial coeffs in reversed order
     """
 
-    n = len(coefficients)
+    n = len(coeffs)
     result: List[float] = [0] * n
 
-    result[n - 1] = coefficients[n - 1]
-    result[n - 2] = coefficients[n - 2] + u * result[n - 1]
+    result[n - 1] = coeffs[n - 1]
+    result[n - 2] = coeffs[n - 2] + u * result[n - 1]
     for i in range(n - 3, -1, -1):
-        result[i] = coefficients[i] + u * result[i + 1] + v * result[i + 2]
+        result[i] = coeffs[i] + u * result[i + 1] + v * result[i + 2]
 
     return result
 
@@ -48,15 +48,13 @@ def _synthetic_division(
 
 
 # noinspection DuplicatedCode
-def bairstow_complex(
-    coefficients: Sequence[float], max_iterations: int = 50
-) -> List[complex]:
+def bairstow_complex(coeffs: Sequence[float], max_iter: int = 50) -> List[complex]:
     """
     Bairstow's Method for finding polynomial roots.
 
     Args:
-        coefficients: Coefficients of the polynomial (constant term last, natural order).
-        max_iterations: Maximum number of iterations to perform.
+        coeffs: Coefficients of the polynomial (constant term last, natural order).
+        max_iter: Maximum number of iterations to perform.
 
     Returns:
         List storing the found roots, none-sorted due to existence of complex roots.
@@ -70,69 +68,67 @@ def bairstow_complex(
     u: float = 0
     v: float = 0
 
-    # initial guess based on leading 3 coefficients as shown on wikipedia
-    # if degree is less than 3 then skip, we don't even need these in that case.
-    if len(coefficients) >= 3:
-        u = coefficients[1] / coefficients[0]
-        v = coefficients[2] / coefficients[0]
+    # initial guess based on leading 3 coeffs as shown on wikipedia
+    # if degree is less than 3 then skip, we don't even need these in that case
+    if len(coeffs) >= 3:
+        u = coeffs[1] / coeffs[0]
+        v = coeffs[2] / coeffs[0]
 
-    # flip coefficients to fit into this algorithm
-    coefficients = coefficients[::-1]
+    # flip coeffs to fit into this algorithm
+    coeffs = coeffs[::-1]
 
-    for _ in range(max_iterations):
-        deg = len(coefficients) - 1
+    for _ in range(max_iter):
+        deg = len(coeffs) - 1
 
         # perform hardwired calculations for deg < 3
         if deg < 1:
             return roots
 
-        if deg == 1 and coefficients[1] != 0:
-            roots.append(-coefficients[0] / coefficients[1])
+        if deg == 1 and coeffs[1] != 0:
+            roots.append(-coeffs[0] / coeffs[1])
             return roots
 
         if deg == 2:
-            d_sqrt = cmath.sqrt(
-                coefficients[1] ** 2 - 4 * coefficients[2] * coefficients[0]
-            )
-            roots.append((-coefficients[1] - d_sqrt) / (2 * coefficients[2]))
-            roots.append((-coefficients[1] + d_sqrt) / (2 * coefficients[2]))
+            d_sqrt = cmath.sqrt(coeffs[1] ** 2 - 4 * coeffs[2] * coeffs[0])
+            roots.append((-coeffs[1] - d_sqrt) / (2 * coeffs[2]))
+            roots.append((-coeffs[1] + d_sqrt) / (2 * coeffs[2]))
             return roots
 
         # deg >= 3, perform Bairstow's method
 
         # do synthetic divisions
-        b = _synthetic_division(coefficients, u, v)
+        b = _synthetic_division(coeffs, u, v)
         c = _synthetic_division(b, u, v)
 
-        # Update u & v
+        # calculate delta and update u & v accordingly
         d = c[2] * c[2] - c[3] * c[1]
         u += (c[2] * -b[1] - c[3] * -b[0]) / d
         v += (-c[1] * -b[1] + c[2] * -b[0]) / d
 
-        # Check for convergence or iteration limit, infinite loop do happens.
+        # check for convergence or iteration limit, infinite loops do happen
         if abs(b[0]) > 1e-14 or abs(b[1]) > 1e-14:
             continue
 
-        # if degree is still large then extract roots of quadratic factor & continue
+        # if degree is still large, then extract roots of a quadratic factor & continue
         if deg >= 3:
             d_sqrt = cmath.sqrt(u**2 - 4 * (-v))
             roots.append((u - d_sqrt) / 2)
             roots.append((u + d_sqrt) / 2)
 
-            coefficients = b[2:]
+            coeffs = b[2:]
 
-    # welp couldn't break within max_iterations
+    # welp couldn't break within max_iter
     return roots
 
 
 # noinspection DuplicatedCode
-def bairstow(coefficients: Sequence[float], max_iterations: int = 50) -> List[float]:
+def bairstow(coeffs: Sequence[float], max_iter: int = 50) -> List[float]:
     """
     Bairstow's Method for finding polynomial roots, non-complex roots only.
 
     Args:
-        coefficients: Coefficients of the polynomial (constant term last, natural order).
-        max_iterations: Maximum number of iterations to perform.
+        coeffs: Coefficients of the polynomial (constant term last, natural order).
+        max_iter: Maximum number of iterations to perform.
 
     Returns:
         List storing the found roots, sorted in ascending order.
@@ -146,51 +142,51 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 50) -> List[fl
     u: float = 0
     v: float = 0
 
-    # initial guess based on leading 3 coefficients as shown on wikipedia
-    # if degree is less than 3 then skip, we don't even need these in that case.
-    if len(coefficients) >= 3:
-        u = coefficients[1] / coefficients[0]
-        v = coefficients[2] / coefficients[0]
+    # initial guess based on leading 3 coeffs as shown on wikipedia
+    # if degree is less than 3 then skip, we don't even need these in that case
+    if len(coeffs) > 3:
+        u = coeffs[1] / coeffs[0]
+        v = coeffs[2] / coeffs[0]
 
-    # flip coefficients to fit into this algorithm
-    coefficients = coefficients[::-1]
+    # flip coeffs to fit into this algorithm
+    coeffs = coeffs[::-1]
 
-    for _ in range(max_iterations):
-        deg = len(coefficients) - 1
+    for _ in range(max_iter):
+        deg = len(coeffs) - 1
 
         # perform hardwired calculations for deg < 3
         if deg < 1:
             return sorted(roots)
 
-        if deg == 1 and coefficients[1] != 0:
-            roots.append(-coefficients[0] / coefficients[1])
+        if deg == 1 and coeffs[1] != 0:
+            roots.append(-coeffs[0] / coeffs[1])
             return sorted(roots)
 
         if deg == 2:
-            d = coefficients[1] ** 2 - 4 * coefficients[2] * coefficients[0]
+            d = coeffs[1] ** 2 - 4 * coeffs[2] * coeffs[0]
 
             if d >= 0:
                 d_sqrt = math.sqrt(d)
-                roots.append((-coefficients[1] - d_sqrt) / (2 * coefficients[2]))
-                roots.append((-coefficients[1] + d_sqrt) / (2 * coefficients[2]))
+                roots.append((-coeffs[1] - d_sqrt) / (2 * coeffs[2]))
+                roots.append((-coeffs[1] + d_sqrt) / (2 * coeffs[2]))
             return sorted(roots)
 
         # deg >= 3, perform Bairstow's method
 
         # do synthetic divisions
-        b = _synthetic_division(coefficients, u, v)
+        b = _synthetic_division(coeffs, u, v)
         c = _synthetic_division(b, u, v)
 
-        # Update u & v
+        # update u & v
         d = c[2] * c[2] - c[3] * c[1]
         u += (c[2] * -b[1] - c[3] * -b[0]) / d
         v += (-c[1] * -b[1] + c[2] * -b[0]) / d
 
-        # Check for convergence or iteration limit, infinite loop do happens.
+        # check for convergence or iteration limit, infinite loops do happen
         if abs(b[0]) > 1e-14 or abs(b[1]) > 1e-14:
             continue
 
-        # if degree is still large then extract roots of quadratic factor & continue
+        # if degree is still large, then extract roots of a quadratic factor & continue
         if deg >= 3:
             d = u**2 - 4 * (-v)
 
@@ -199,9 +195,9 @@ def bairstow(coefficients: Sequence[float], max_iterations: int = 50) -> List[fl
                 roots.append((u - d_sqrt) / 2)
                 roots.append((u + d_sqrt) / 2)
 
-            coefficients = b[2:]
+            coeffs = b[2:]
 
-    # welp couldn't break within max_iterations
+    # welp couldn't break within max_iter
     return sorted(roots)
 
 
@@ -218,7 +214,7 @@ if __name__ == "__main__":
     ]
 
     for _polynomial in _polynomials:
-        print("\nCoefficients:", _polynomial)
+        print("\ncoeffs:", _polynomial)
 
         _roots_dict = {
             "Complex": bairstow_complex(_polynomial),
