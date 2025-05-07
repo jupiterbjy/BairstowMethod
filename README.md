@@ -3,11 +3,12 @@
 Bairstow's Method for finding polynomial roots in iterative way.
 
 Original Python 2+ recursive code by https://github.com/PowerUpMasters  
-Fork by https://github.com/jupiterbjy
+Fork by jupiterbjy
 
 This is more optimized, simplified and heavily modernized rewrite
-intended for lightweight use cases and help better understanding of algorithm.
+intended for lightweight use cases and (hopefully) help better understanding of algorithm.
 
+For explanation of algorithm see [Oscar Veliz's video](https://youtu.be/iUGEk6kngFw)
 
 ## Examples
 
